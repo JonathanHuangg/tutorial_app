@@ -42,20 +42,55 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) { // every widget has one to show stuff on screen
     var appState = context.watch<MyAppState>(); // track changes in the app
+    var pair = appState.current; // extract appState.current into its own widget so you can do more stuff to it
+  
 
     return Scaffold( // build must always return a widget
-      body: Column( // like in html
-        children: [
-          // There is hot reload here
-          Text('Goat BAHHHHHHHHHH'),
-          Text(appState.current.asLowerCase),
+      body: Center(
+        child: Column( // like in html
+          mainAxisAlignment: MainAxisAlignment.center, // this centers the children with each other
+          children: [
+            // There is hot reload here
+            Text('Goat BAHHHHHHHHHH'),
+            BigCard(pair: pair), // this used to be Text(pair.aslowercase) but after extracting as its own widget
+        
+            // adding this is also hot reloaded
+            ElevatedButton(onPressed: () {
+              appState.getNext();
+            }, 
+            child: Text('Next'))
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-          // adding this is also hot reloaded
-          ElevatedButton(onPressed: () {
-            appState.getNext();
-          }, 
-          child: Text('Next'))
-        ],
+// This was automatically created
+class BigCard extends StatelessWidget {
+  const BigCard({
+    super.key,
+    required this.pair,
+  });
+
+  final WordPair pair;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context); // requests current app theme
+    final style = theme.textTheme.displayMedium!.copyWith(
+      color: theme.colorScheme.onPrimary,
+    );
+    
+    return Card (
+      color: theme.colorScheme.primary, // uses primary color of the app
+      child: Padding( // Refactored to wrap padding, then refactored to wrap widget
+        padding: const EdgeInsets.all(8.0),
+        child: Text( // this reminds me of html
+          pair.asLowerCase, 
+          style: style,
+          semanticsLabel: "${pair.first}, ${pair.second}",
+        ), 
       ),
     );
   }
