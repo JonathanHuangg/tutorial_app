@@ -36,6 +36,17 @@ class MyAppState extends ChangeNotifier {
     current = WordPair.random();
     notifyListeners(); 
   }
+
+  var favorites = <WordPair>[];
+
+  // add/remove to/from favorites list
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -43,7 +54,13 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) { // every widget has one to show stuff on screen
     var appState = context.watch<MyAppState>(); // track changes in the app
     var pair = appState.current; // extract appState.current into its own widget so you can do more stuff to it
-  
+
+    IconData icon;
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
 
     return Scaffold( // build must always return a widget
       body: Center(
@@ -55,10 +72,22 @@ class MyHomePage extends StatelessWidget {
             BigCard(pair: pair), // this used to be Text(pair.aslowercase) but after extracting as its own widget
         
             // adding this is also hot reloaded
-            ElevatedButton(onPressed: () {
-              appState.getNext();
-            }, 
-            child: Text('Next'))
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(onPressed: () {
+                  appState.getNext();
+                }, 
+                child: Text('Next')),
+
+                ElevatedButton.icon(onPressed: () {
+                  appState.toggleFavorite();
+                }, 
+                icon: Icon(icon),
+                label: Text('Favorite'),),
+                SizedBox(width: 10),
+              ],
+            )
           ],
         ),
       ),
